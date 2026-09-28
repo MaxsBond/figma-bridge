@@ -1,0 +1,24 @@
+{
+  "name": "figma-bridge-mcp",
+  "version": "1.0.0",
+  "description": "Local MCP server bridging AI agents (Claude, Codex, Copilot) to Figma through a development plugin (no REST/MCP rate limits)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "Max Bondar",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.1",
+    "ws": "^8.21.3",
+    "zod": "^4.6.5"
+  },
+  "type": "module",
+  "bin": {
+    "figma-bridge-mcp": "server.js"
+  }
+}

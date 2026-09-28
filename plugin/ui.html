@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<body style="font: 12px/1.4 Inter, system-ui, sans-serif; margin: 10px; color: #333">
+  <div><b>Claude Bridge</b></div>
+  <div id="status">connecting…</div>
+  <div id="last" style="color:#888; margin-top:4px"></div>
+<script>
+const PORT = 3055;
+const statusEl = document.getElementById('status');
+const lastEl = document.getElementById('last');
+let ws = null;
+let retryMs = 1000;
+
+function setStatus(text, color) {
+  statusEl.textContent = text;
+  statusEl.style.color = color || '#333';
+}
+
+function toBase64(bytes) {
+  let bin = '';
+  const step = 0x8000;
+  for (let i = 0; i < bytes.length; i += step) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + step));
+  }
+  return btoa(bin);
+}
+
+// Uint8Array can't go through JSON, so binary results travel as {__bytes: base64}.
+function encodeBinary(value) {
+  if (value instanceof Uint8Array) return { __bytes: toBase64(value) };
+  if (Array.isArray(value)) return value.map(encodeBinary);
+  if (value && typeof value === 'object') {
+    const out = {};
+    for (const k of Object.keys(value)) out[k] = encodeBinary(value[k]);
+    return out;
+  }
+  return value;
+}
+
+function connect() {
+  ws = new WebSocket('ws://localhost:' + PORT);
+  ws.onopen = () => {
+    retryMs = 1000;
+    setStatus('connected to MCP server', '#1a7f37');
+    parent.postMessage({ pluginMessage: { type: 'hello' } }, '*');
+  };
+  ws.onmessage = (event) => {
+    let msg;
+    try { msg = JSON.parse(event.data); } catch (e) { return; }
+    if (msg.type !== 'request') return;
+    lastEl.textContent = 'last: ' + msg.method;
+    parent.postMessage({ pluginMessage: msg }, '*');
+  };
+  ws.onclose = () => {
+    setStatus('disconnected — retrying…', '#b35900');
+    setTimeout(connect, retryMs);
+    retryMs = Math.min(retryMs * 2, 10000);
+  };
+  ws.onerror = () => {};
+}
+
+window.onmessage = (event) => {
+  const msg = event.data && event.data.pluginMessage;
+  if (!msg || !ws || ws.readyState !== WebSocket.OPEN) return;
+  if (msg.type === 'response') msg.result = encodeBinary(msg.result);
+  ws.send(JSON.stringify(msg));
+};
+
+connect();
+</script>
+</body>
+</html>
