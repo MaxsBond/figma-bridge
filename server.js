@@ -8,8 +8,31 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { WebSocketServer } from 'ws';
 import { z } from 'zod';
 import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const PKG_DIR = path.dirname(fileURLToPath(import.meta.url));
+const PKG = JSON.parse(await readFile(path.join(PKG_DIR, 'package.json'), 'utf8'));
+
+// `figma-bridge setup`: copy the Figma plugin somewhere easy to find (the npx
+// cache is not) and open the folder, so it can be imported from its manifest.
+if (process.argv[2] === 'setup') {
+  const docs = path.join(os.homedir(), 'Documents');
+  const base = await stat(docs).then((s) => s.isDirectory(), () => false) ? docs : os.homedir();
+  const dest = path.join(base, 'Figma Bridge Plugin');
+  await cp(path.join(PKG_DIR, 'plugin'), dest, { recursive: true, force: true });
+  console.log(`Figma plugin copied to:\n  ${dest}\n`);
+  console.log('In Figma Desktop: Plugins → Development → Import plugin from manifest…');
+  console.log(`and pick ${path.join(dest, 'manifest.json')}`);
+  if (!process.argv.includes('--no-open')) {
+    const opener = { darwin: 'open', win32: 'explorer' }[process.platform] || 'xdg-open';
+    spawn(opener, [dest], { detached: true, stdio: 'ignore' }).on('error', () => {}).unref();
+  }
+  process.exit(0);
+}
 
 const PORT = Number(process.env.FIGMA_BRIDGE_PORT || 3055);
 const OUT_DIR = process.env.FIGMA_BRIDGE_OUT_DIR || path.join(process.cwd(), 'figma-exports');
@@ -163,7 +186,7 @@ function tool(fn) {
 
 // ---------- MCP side ----------
 
-const server = new McpServer({ name: 'figma-bridge', version: '0.1.0' });
+const server = new McpServer({ name: 'figma-bridge', version: PKG.version });
 
 const nodeIdArg = z.string().describe('Node id ("1:2" or "1-2") or a Figma URL containing ?node-id=');
 

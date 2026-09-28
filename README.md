@@ -9,64 +9,81 @@ plugin instead of the REST API or Figma's hosted MCP, so:
 - the agent can **write** to the file, not only read it (via `figma_run_script`).
 
 ```
-AI agent ──stdio──> server.js ──ws://127.0.0.1:3055──> plugin/ui.html ──postMessage──> plugin/code.js (Plugin API)
+AI agent ──stdio──> figma-bridge (server.js) ──ws://127.0.0.1:3055──> plugin/ui.html ──postMessage──> plugin/code.js (Plugin API)
 ```
 
-The agent starts `server.js` as a stdio MCP server. The server opens a WebSocket on
+The agent starts the server (`npx -y @maxsbond/figma-bridge`) as a stdio MCP server. The server opens a WebSocket on
 `127.0.0.1:3055` and waits. The "Figma Bridge" plugin, running in Figma Desktop,
 connects to it and executes each request with the Plugin API in the open file.
 
 ## Requirements
 
-- Node.js 18+
+- [Node.js](https://nodejs.org) 18 or newer (the LTS installer is fine)
 - Figma Desktop (the browser version can't reach localhost from a dev plugin)
 - Edit access to the file. Figma doesn't run plugins in view-only files; if you only have
   view access, duplicate the file to your drafts.
 
 ## Install
 
+There are two parts: the MCP server, which your AI agent starts on its own, and the
+Figma plugin, which you import into Figma once. The server is published on npm as
+[`@maxsbond/figma-bridge`](https://www.npmjs.com/package/@maxsbond/figma-bridge), so
+there is nothing to clone or build.
+
+### 1. Add the server to your agent
+
+**VS Code (GitHub Copilot):** click
+[**Install in VS Code**](https://insiders.vscode.dev/redirect/mcp/install?name=figma-bridge&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40maxsbond%2Ffigma-bridge%22%5D%7D)
+and confirm in VS Code. Other agents are in the sections below.
+
+### 2. Set up the Figma plugin
+
+You import the plugin once. After that you only need to run it (step 4).
+
+**1. Get the plugin files.** Run this in a terminal:
+
 ```bash
-git clone https://github.com/MaxsBond/Figma-bridge.git
-cd Figma-bridge
-npm install
+npx -y @maxsbond/figma-bridge setup
 ```
 
-### Set up the Figma plugin
+It copies the plugin to `Documents/Figma Bridge Plugin` and opens that folder. Run it
+again after updating to get the new plugin version.
 
-You import the plugin once. After that you only need to run it (step 3).
-
-**1. Import the plugin.** In Figma Desktop open any design file, click the Figma logo in
+**2. Import the plugin.** In Figma Desktop open any design file, click the Figma logo in
 the top-left corner and go to **Plugins → Development → Import plugin from manifest…**
 (right-clicking the canvas gets you the same **Plugins** menu).
 
 <!-- screenshot: Plugins → Development → Import plugin from manifest… -->
 
-**2. Pick `plugin/manifest.json`** from the cloned repo and click **Open**. "Figma Bridge"
-now shows up under Plugins → Development.
+**3. Pick `manifest.json`** in the `Figma Bridge Plugin` folder and click **Open**.
+"Figma Bridge" now shows up under Plugins → Development.
 
-<!-- screenshot: Selecting plugin/manifest.json in the file dialog -->
+<!-- screenshot: Selecting manifest.json in the file dialog -->
 
-**3. Run the plugin** whenever you want the agent to work in Figma: open the file and pick
+**4. Run the plugin** whenever you want the agent to work in Figma: open the file and pick
 **Plugins → Development → Figma Bridge**.
 
 <!-- screenshot: Plugins → Development → Figma Bridge -->
 
-**4. Check the connection.** The small plugin window says **connected to MCP server** once
+**5. Check the connection.** The small plugin window says **connected to MCP server** once
 an agent with this MCP is running (see the next sections). If the agent isn't running yet,
 it says "disconnected — retrying…" and connects by itself when the agent starts. Keep the
 window open while you work, since closing it stops the bridge.
 
 <!-- screenshot: Figma Bridge plugin window: connected to MCP server -->
 
-In all the configs below, replace `/absolute/path/to/Figma-bridge` with where you cloned
-the repo.
+### From source
+
+If you'd rather run a checkout: clone the repo, run `npm install`, import
+`plugin/manifest.json` from it, and in the configs below use `node` with
+`/absolute/path/to/figma-bridge/server.js` instead of `npx -y @maxsbond/figma-bridge`.
 
 ## Use with Claude
 
 ### Claude Code
 
 ```bash
-claude mcp add --scope user figma-bridge -- node /absolute/path/to/Figma-bridge/server.js
+claude mcp add --scope user figma-bridge -- npx -y @maxsbond/figma-bridge
 ```
 
 Check it with `claude mcp list`, or `/mcp` inside a session. Exports go to
@@ -81,8 +98,8 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
 {
   "mcpServers": {
     "figma-bridge": {
-      "command": "node",
-      "args": ["/absolute/path/to/Figma-bridge/server.js"],
+      "command": "npx",
+      "args": ["-y", "@maxsbond/figma-bridge"],
       "env": {
         "FIGMA_BRIDGE_OUT_DIR": "/absolute/path/to/figma-exports"
       }
@@ -100,15 +117,15 @@ Works for the Codex CLI, the Codex IDE extension and the ChatGPT desktop app. Th
 read `~/.codex/config.toml`.
 
 ```bash
-codex mcp add figma-bridge -- node /absolute/path/to/Figma-bridge/server.js
+codex mcp add figma-bridge -- npx -y @maxsbond/figma-bridge
 ```
 
 or add it by hand:
 
 ```toml
 [mcp_servers.figma-bridge]
-command = "node"
-args = ["/absolute/path/to/Figma-bridge/server.js"]
+command = "npx"
+args = ["-y", "@maxsbond/figma-bridge"]
 # Codex's default per-tool timeout is 60 s; big exports and scripts can take longer.
 tool_timeout_sec = 180
 
@@ -123,16 +140,16 @@ Check it with `codex mcp list`, or `/mcp` inside the Codex TUI.
 
 ### VS Code (Copilot Chat, agent mode)
 
-Add `.vscode/mcp.json` to your project (or run **MCP: Add Server…** from the command
-palette to put it in your user settings instead):
+The **Install in VS Code** link above adds the server to your user settings. To add it
+to one project instead, create `.vscode/mcp.json`:
 
 ```json
 {
   "servers": {
     "figma-bridge": {
       "type": "stdio",
-      "command": "node",
-      "args": ["/absolute/path/to/Figma-bridge/server.js"],
+      "command": "npx",
+      "args": ["-y", "@maxsbond/figma-bridge"],
       "env": {
         "FIGMA_BRIDGE_OUT_DIR": "${workspaceFolder}/figma-exports"
       }
@@ -143,7 +160,8 @@ palette to put it in your user settings instead):
 
 Click **Start** above the server entry (or run **MCP: List Servers → figma-bridge →
 Start**), switch Copilot Chat to **Agent** mode and make sure the `figma_*` tools are
-ticked in the tools picker. MCP tools aren't available in Ask/Edit mode.
+ticked in the tools picker. MCP tools aren't available in Ask/Edit mode. On Copilot
+Business/Enterprise your organization admin has to allow MCP servers.
 
 ### Copilot CLI
 
@@ -154,8 +172,8 @@ Add it with `/mcp add` inside `copilot`, or edit `~/.copilot/mcp-config.json`:
   "mcpServers": {
     "figma-bridge": {
       "type": "local",
-      "command": "node",
-      "args": ["/absolute/path/to/Figma-bridge/server.js"],
+      "command": "npx",
+      "args": ["-y", "@maxsbond/figma-bridge"],
       "tools": ["*"]
     }
   }
