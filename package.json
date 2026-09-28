@@ -1,6 +1,6 @@
 {
   "name": "@maxsbond/figma-bridge",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Local MCP server bridging AI agents (Claude, Codex, Copilot) to Figma through a development plugin (no REST/MCP rate limits)",
   "main": "server.js",
   "scripts": {

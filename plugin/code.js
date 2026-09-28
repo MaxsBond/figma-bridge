@@ -245,11 +245,30 @@ const handlers = {
   },
 
   async runScript({ code }) {
-    const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-    const fn = new AsyncFunction('figma', code);
-    return await fn(figma);
+    return await compileScript(code)(figma);
   },
 };
+
+// Some Figma sandbox versions block the AsyncFunction constructor, so fall back
+// to Function with an async wrapper, then to indirect eval. A SyntaxError is the
+// script's own fault and is thrown right away instead of trying the next way.
+function compileScript(code) {
+  const ways = [
+    ['AsyncFunction', () => new (Object.getPrototypeOf(async function () {}).constructor)('figma', code)],
+    ['Function', () => new Function('figma', 'return (async () => {\n' + code + '\n})();')],
+    ['eval', () => (0, eval)('(async (figma) => {\n' + code + '\n})')],
+  ];
+  const failures = [];
+  for (const [name, make] of ways) {
+    try {
+      return make();
+    } catch (e) {
+      if (e instanceof SyntaxError) throw e;
+      failures.push(name + ': ' + ((e && e.message) || e));
+    }
+  }
+  throw new Error('This Figma sandbox does not allow running code from strings (' + failures.join('; ') + ')');
+}
 
 figma.ui.onmessage = async (msg) => {
   if (!msg || msg.type !== 'request') return;
