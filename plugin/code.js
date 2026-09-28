@@ -1,7 +1,7 @@
-// Claude Bridge — runs inside Figma's plugin sandbox. The UI iframe (ui.html)
+// Figma Bridge — runs inside Figma's plugin sandbox. The UI iframe (ui.html)
 // relays requests from the local MCP server over WebSocket; results go back the same way.
 
-figma.showUI(__html__, { width: 240, height: 80, title: 'Claude Bridge' });
+figma.showUI(__html__, { width: 240, height: 80, title: 'Figma Bridge' });
 
 const MIXED = figma.mixed;
 

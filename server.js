@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Claude Bridge MCP server: stdio MCP for Claude Code on one side, a localhost
-// WebSocket to the "Claude Bridge" Figma plugin on the other. Everything runs
+// Figma Bridge MCP server: stdio MCP for Claude Code on one side, a localhost
+// WebSocket to the "Figma Bridge" Figma plugin on the other. Everything runs
 // through the Plugin API in the open file, so no REST/MCP rate limits apply.
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -93,7 +93,7 @@ async function call(method, params = {}) {
   if (bridgeError) throw new Error(bridgeError);
   if (!plugin) {
     return Promise.reject(new Error(
-      'Figma plugin is not connected. In Figma Desktop open the file and run Plugins → Development → Claude Bridge.',
+      'Figma plugin is not connected. In Figma Desktop open the file and run Plugins → Development → Figma Bridge.',
     ));
   }
   const id = randomUUID();

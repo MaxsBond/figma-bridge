@@ -1,6 +1,6 @@
 {
-  "name": "Claude Bridge",
-  "id": "claude-bridge-local-dev",
+  "name": "Figma Bridge",
+  "id": "figma-bridge-local-dev",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
@@ -10,6 +10,6 @@
   "networkAccess": {
     "allowedDomains": ["none"],
     "devAllowedDomains": ["ws://localhost:3055"],
-    "reasoning": "Connects only to the local Claude Bridge MCP server."
+    "reasoning": "Connects only to the local Figma Bridge MCP server."
   }
 }

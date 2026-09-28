@@ -13,7 +13,7 @@ AI agent ──stdio──> server.js ──ws://127.0.0.1:3055──> plugin/ui
 ```
 
 The agent starts `server.js` as a stdio MCP server. The server opens a WebSocket on
-`127.0.0.1:3055` and waits. The "Claude Bridge" plugin, running in Figma Desktop,
+`127.0.0.1:3055` and waits. The "Figma Bridge" plugin, running in Figma Desktop,
 connects to it and executes each request with the Plugin API in the open file.
 
 ## Requirements
@@ -41,22 +41,22 @@ the top-left corner and go to **Plugins → Development → Import plugin from m
 
 <!-- screenshot: Plugins → Development → Import plugin from manifest… -->
 
-**2. Pick `plugin/manifest.json`** from the cloned repo and click **Open**. "Claude Bridge"
+**2. Pick `plugin/manifest.json`** from the cloned repo and click **Open**. "Figma Bridge"
 now shows up under Plugins → Development.
 
 <!-- screenshot: Selecting plugin/manifest.json in the file dialog -->
 
 **3. Run the plugin** whenever you want the agent to work in Figma: open the file and pick
-**Plugins → Development → Claude Bridge**.
+**Plugins → Development → Figma Bridge**.
 
-<!-- screenshot: Plugins → Development → Claude Bridge -->
+<!-- screenshot: Plugins → Development → Figma Bridge -->
 
 **4. Check the connection.** The small plugin window says **connected to MCP server** once
 an agent with this MCP is running (see the next sections). If the agent isn't running yet,
 it says "disconnected — retrying…" and connects by itself when the agent starts. Keep the
 window open while you work, since closing it stops the bridge.
 
-<!-- screenshot: Claude Bridge plugin window: connected to MCP server -->
+<!-- screenshot: Figma Bridge plugin window: connected to MCP server -->
 
 In all the configs below, replace `/absolute/path/to/Figma-bridge` with where you cloned
 the repo.
@@ -194,7 +194,7 @@ Things to try once it's connected:
 
 ## Troubleshooting
 
-**"Figma plugin is not connected"**: run Plugins → Development → Claude Bridge in the
+**"Figma plugin is not connected"**: run Plugins → Development → Figma Bridge in the
 file you want to work on. The plugin only sees that one file.
 
 **"Port 3055 is already taken"**: only one server can hold the port, and the plugin talks
