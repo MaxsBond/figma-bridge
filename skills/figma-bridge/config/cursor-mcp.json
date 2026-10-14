@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "figma-bridge": {
+      "command": "npx",
+      "args": ["-y", "@maxsbond/figma-bridge"]
+    }
+  }
+}

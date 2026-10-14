@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "figma-bridge": {
+      "command": "npx",
+      "args": ["-y", "@maxsbond/figma-bridge"],
+      "env": {
+        "FIGMA_BRIDGE_OUT_DIR": "/absolute/path/to/figma-exports"
+      }
+    }
+  }
+}

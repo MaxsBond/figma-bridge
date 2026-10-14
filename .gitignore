@@ -1,3 +1,4 @@
 node_modules/
 figma-exports/
 .DS_Store
+dist/

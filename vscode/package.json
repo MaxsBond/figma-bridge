@@ -1,0 +1,67 @@
+{
+  "name": "figma-bridge",
+  "displayName": "Figma Bridge",
+  "description": "Lets GitHub Copilot read and edit the file you have open in Figma Desktop. No Node.js or config files needed.",
+  "version": "1.1.0",
+  "publisher": "maxsbond",
+  "license": "MIT",
+  "author": "Max Bondar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaxsBond/figma-bridge.git"
+  },
+  "homepage": "https://github.com/MaxsBond/figma-bridge#readme",
+  "bugs": {
+    "url": "https://github.com/MaxsBond/figma-bridge/issues"
+  },
+  "engines": {
+    "vscode": "^1.101.0"
+  },
+  "categories": [
+    "AI",
+    "Chat"
+  ],
+  "keywords": [
+    "figma",
+    "mcp",
+    "copilot",
+    "design"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "figma-bridge",
+        "label": "Figma Bridge"
+      }
+    ],
+    "commands": [
+      {
+        "command": "figmaBridge.setupPlugin",
+        "title": "Set Up Figma Plugin",
+        "category": "Figma Bridge"
+      },
+      {
+        "command": "figmaBridge.openExports",
+        "title": "Open Exports Folder",
+        "category": "Figma Bridge"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "vscode:prepublish": "npm run build",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@maxsbond/figma-bridge": "1.1.0",
+    "@vscode/vsce": "^3.6.0",
+    "esbuild": "^0.25.0"
+  }
+}

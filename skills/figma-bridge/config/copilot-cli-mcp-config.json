@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "figma-bridge": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@maxsbond/figma-bridge"],
+      "tools": ["*"]
+    }
+  }
+}

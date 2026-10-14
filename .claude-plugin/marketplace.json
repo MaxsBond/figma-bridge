@@ -1,0 +1,14 @@
+{
+  "name": "figma-bridge",
+  "description": "Figma Bridge: let your agent read and edit the file open in Figma Desktop.",
+  "owner": {
+    "name": "Max Bondar"
+  },
+  "plugins": [
+    {
+      "name": "figma-bridge",
+      "source": "./",
+      "description": "Read and edit the file open in Figma Desktop: MCP server plus a skill that tells the agent how to use it."
+    }
+  ]
+}

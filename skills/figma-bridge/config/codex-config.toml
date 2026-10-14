@@ -1,0 +1,9 @@
+[mcp_servers.figma-bridge]
+command = "npx"
+args = ["-y", "@maxsbond/figma-bridge"]
+# Codex's default per-tool timeout is 60 s; big exports and scripts can take longer.
+tool_timeout_sec = 180
+
+# optional
+# [mcp_servers.figma-bridge.env]
+# FIGMA_BRIDGE_OUT_DIR = "/absolute/path/to/figma-exports"

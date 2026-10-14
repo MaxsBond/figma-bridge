@@ -4,7 +4,8 @@
   "description": "Local MCP server bridging AI agents (Claude, Codex, Copilot) to Figma through a development plugin (no REST/MCP rate limits)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "pack:skill": "sh scripts/pack-skill.sh"
   },
   "keywords": [
     "mcp",

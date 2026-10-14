@@ -8,6 +8,8 @@ plugin instead of the REST API or Figma's hosted MCP, so:
 - there are **no rate limits** and no response truncation,
 - the agent can **write** to the file, not only read it (via `figma_run_script`).
 
+![How Figma Bridge works](docs/images/how-it-works.png)
+
 ```
 AI agent ──stdio──> figma-bridge (server.js) ──ws://127.0.0.1:3055──> plugin/ui.html ──postMessage──> plugin/code.js (Plugin API)
 ```
@@ -29,6 +31,9 @@ There are two parts: the MCP server, which your AI agent starts on its own, and 
 Figma plugin, which you import into Figma once. The server is published on npm as
 [`@maxsbond/figma-bridge`](https://www.npmjs.com/package/@maxsbond/figma-bridge), so
 there is nothing to clone or build.
+
+New to this? The [step-by-step guide](docs/getting-started.md) walks through the same
+setup with screenshots and tells you what to say to your agent.
 
 ### 1. Add the server to your agent
 
@@ -53,24 +58,24 @@ again after updating to get the new plugin version.
 the top-left corner and go to **Plugins → Development → Import plugin from manifest…**
 (right-clicking the canvas gets you the same **Plugins** menu).
 
-<!-- screenshot: Plugins → Development → Import plugin from manifest… -->
+![Plugins → Development → Import plugin from manifest…](docs/images/import-plugin-menu.jpg)
 
 **3. Pick `manifest.json`** in the `Figma Bridge Plugin` folder and click **Open**.
 "Figma Bridge" now shows up under Plugins → Development.
 
-<!-- screenshot: Selecting manifest.json in the file dialog -->
+![Selecting manifest.json in the file dialog](docs/images/pick-manifest.jpg)
 
 **4. Run the plugin** whenever you want the agent to work in Figma: open the file and pick
 **Plugins → Development → Figma Bridge**.
 
-<!-- screenshot: Plugins → Development → Figma Bridge -->
+![Plugins → Development → Figma Bridge](docs/images/run-plugin-menu.jpg)
 
 **5. Check the connection.** The small plugin window says **connected to MCP server** once
 an agent with this MCP is running (see the next sections). If the agent isn't running yet,
 it says "disconnected — retrying…" and connects by itself when the agent starts. Keep the
 window open while you work, since closing it stops the bridge.
 
-<!-- screenshot: Figma Bridge plugin window: connected to MCP server -->
+![Figma Bridge plugin window: connected to MCP server](docs/images/plugin-connected.jpg)
 
 ### From source
 
@@ -88,6 +93,14 @@ claude mcp add --scope user figma-bridge -- npx -y @maxsbond/figma-bridge
 
 Check it with `claude mcp list`, or `/mcp` inside a session. Exports go to
 `./figma-exports/` in the directory you started `claude` from.
+
+Or install it as a plugin, which adds the MCP server and the [skill](#agent-skill) in one go.
+Inside a Claude Code session:
+
+```
+/plugin marketplace add MaxsBond/figma-bridge
+/plugin install figma-bridge@figma-bridge
+```
 
 ### Claude Desktop
 
@@ -201,6 +214,21 @@ Things to try once it's connected:
 - "Build this React component from Figma node 12:345."
 - "Rename every layer called `Frame 12…` on this page to something meaningful."
 - "Make a dark variant of the selected component set."
+
+## Agent skill
+
+[`skills/figma-bridge/`](skills/figma-bridge/SKILL.md) is a skill that tells the agent
+when to reach for the `figma_*` tools and how to use them well: check the connection
+first, find nodes cheaply, export instead of dumping JSON inline, write safe Plugin API
+scripts, and build code from a frame. It also walks the agent through setup when the
+server or plugin is missing.
+
+- **Claude Code**: the plugin install above includes it. Or copy the folder to
+  `~/.claude/skills/figma-bridge/`.
+- **Other agents that support skills** (Codex, Cursor, Copilot and others): copy the
+  folder to wherever your agent loads skills from.
+- **Zip for skill marketplaces**: `npm run pack:skill` builds `dist/figma-bridge-skill.zip`
+  with `SKILL.md` at the root.
 
 ## Configuration
 

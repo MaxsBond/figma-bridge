@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "figma-bridge": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@maxsbond/figma-bridge"],
+      "env": {
+        "FIGMA_BRIDGE_OUT_DIR": "${workspaceFolder}/figma-exports"
+      }
+    }
+  }
+}
