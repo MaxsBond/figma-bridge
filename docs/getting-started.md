@@ -16,10 +16,13 @@ You need:
 The simplest way is to ask your agent to do it. Paste this into Claude Code, Codex,
 Copilot or any other agent that can run terminal commands:
 
-> Set up Figma Bridge from https://github.com/MaxsBond/figma-bridge for me. Add the MCP
-> server `npx -y @maxsbond/figma-bridge` to your own MCP config, then run
-> `npx -y @maxsbond/figma-bridge setup` to copy the Figma plugin. Tell me if I need to
-> restart you.
+```text
+Install Figma Bridge (https://github.com/MaxsBond/figma-bridge) for me:
+1. Add the MCP server to your own MCP config: command `npx`, args `["-y", "@maxsbond/figma-bridge"]`. If the config file already exists, merge the entry instead of overwriting it.
+2. Run `npx -y @maxsbond/figma-bridge setup` to copy the Figma plugin to ~/Documents/Figma Bridge Plugin.
+3. Tell me how to import the plugin in Figma Desktop (Plugins → Development → Import plugin from manifest…, pick manifest.json from that folder) and how to run it in my file (Plugins → Development → Figma Bridge).
+4. Tell me if I need to restart you. After the restart, call figma_status to check the connection.
+```
 
 Restart the agent afterwards so it picks up the new server.
 

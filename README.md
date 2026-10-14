@@ -25,6 +25,22 @@ connects to it and executes each request with the Plugin API in the open file.
 - Edit access to the file. Figma doesn't run plugins in view-only files; if you only have
   view access, duplicate the file to your drafts.
 
+## Quick install
+
+Paste this into Claude Code, Codex, Copilot or any other agent that can run terminal
+commands. It sets up everything except the two clicks in Figma, and tells you what those are.
+
+```text
+Install Figma Bridge (https://github.com/MaxsBond/figma-bridge) for me:
+1. Add the MCP server to your own MCP config: command `npx`, args `["-y", "@maxsbond/figma-bridge"]`. If the config file already exists, merge the entry instead of overwriting it.
+2. Run `npx -y @maxsbond/figma-bridge setup` to copy the Figma plugin to ~/Documents/Figma Bridge Plugin.
+3. Tell me how to import the plugin in Figma Desktop (Plugins → Development → Import plugin from manifest…, pick manifest.json from that folder) and how to run it in my file (Plugins → Development → Figma Bridge).
+4. Tell me if I need to restart you. After the restart, call figma_status to check the connection.
+```
+
+Prefer to do it by hand? Follow the steps below or the
+[step-by-step guide](docs/getting-started.md).
+
 ## Install
 
 There are two parts: the MCP server, which your AI agent starts on its own, and the
